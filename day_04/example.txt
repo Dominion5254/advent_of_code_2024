@@ -8,12 +8,3 @@ SMSMSASXSS
 SAXAMASAAA
 MAMMMXMMMM
 MXMXAXMASX
-
-Matched SAM with 'A' at index 6 -> 89
-Matched SAM with 'A' at index 10 -> 78
-Matched SAM with 'A' at index 23 -> 80
-Matched SAM with 'A' at index 37
-Matched SAM with 'A' at index 40
-Matched SAM with 'A' at index 61
-Matched SAM with 'A' at index 68
-Matched SAM with 'A' at index 101

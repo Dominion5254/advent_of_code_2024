@@ -1,12 +1,15 @@
-use std::fs;
+use std::{
+    fs,
+    ops::{Add, Sub},
+};
 
 use diagonal::{diagonal_pos_neg, diagonal_pos_pos};
-use regex::{Match, Regex};
+use regex::Regex;
 
 fn main() {
-    let input = fs::read_to_string("./example.txt").expect("Failed to read file");
+    let input = fs::read_to_string("./input.txt").expect("Failed to read file");
     let vecs = parse_input(&input);
-    let answer = fucking_diagonals(vecs);
+    let answer = stupid_elf(vecs);
     println!("Result: {:?}", answer);
 }
 
@@ -53,32 +56,50 @@ fn count_xmas(vectors: Vec<Vec<Vec<char>>>) -> usize {
             .collect::<Vec<String>>()
             .join("\n");
 
-        count +=  query.find_iter(&text).count();
-        count +=  query_reversed.find_iter(&text).count();
+        count += query.find_iter(&text).count();
+        count += query_reversed.find_iter(&text).count();
     }
 
     count
 }
 
-fn fucking_diagonals(vectors: Vec<Vec<Vec<char>>>) -> usize {
-    let important_diag = &vectors[2];
-    let query = Regex::new(r"MAS").unwrap();
-    let query_reversed = Regex::new(r"SAM").unwrap();
-    let mut count: usize = 0;
-    let text = important_diag
-        .iter()
-        .map(|inner| inner.into_iter().collect::<String>())
-        .collect::<Vec<String>>()
-        .join("\n");
-    println!("Text:\n{}", text);
-    // let initial_matches = query_reversed.find_iter(&text).collect::<Vec<Match>>();
-    // for m in initial_matches {
-    //     println!("Matched {} with 'A' at index {}", m.as_str(), m.start() + 1);
-    // }
+fn stupid_elf(vectors: Vec<Vec<Vec<char>>>) -> usize {
+    let important_vec = vectors[0].clone();
+    let row_count = important_vec.len();
+    let col_count = important_vec[0].len();
+    let mut xmas_count: usize = 0;
 
-    for group in important_diag.windows(3) {
-        
+    for row_idx in 1..row_count.sub(1) {
+        for col_idx in 1..col_count.sub(1) {
+            if important_vec[row_idx][col_idx] == 'A' {
+                if important_vec[row_idx.sub(1)][col_idx.sub(1)] == 'M'
+                    && important_vec[row_idx.add(1)][col_idx.add(1)] == 'S'
+                {
+                    if important_vec[row_idx.sub(1)][col_idx.add(1)] == 'M'
+                        && important_vec[row_idx.add(1)][col_idx.sub(1)] == 'S'
+                    {
+                        xmas_count += 1;
+                    } else if important_vec[row_idx.sub(1)][col_idx.add(1)] == 'S'
+                        && important_vec[row_idx.add(1)][col_idx.sub(1)] == 'M'
+                    {
+                        xmas_count += 1;
+                    }
+                } else if important_vec[row_idx.sub(1)][col_idx.sub(1)] == 'S'
+                    && important_vec[row_idx.add(1)][col_idx.add(1)] == 'M'
+                {
+                    if important_vec[row_idx.sub(1)][col_idx.add(1)] == 'M'
+                        && important_vec[row_idx.add(1)][col_idx.sub(1)] == 'S'
+                    {
+                        xmas_count += 1;
+                    } else if important_vec[row_idx.sub(1)][col_idx.add(1)] == 'S'
+                        && important_vec[row_idx.add(1)][col_idx.sub(1)] == 'M'
+                    {
+                        xmas_count += 1;
+                    }
+                }
+            }
+        }
     }
 
-    10
+    xmas_count
 }

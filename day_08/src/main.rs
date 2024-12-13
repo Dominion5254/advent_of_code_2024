@@ -50,38 +50,82 @@ fn count_antinodes(grid: Vec<Vec<char>>, antenna_map: HashMap<char, Vec<(i32, i3
             }
         }
         for (pair1, pair2) in antenna_pairs {
-            // (3, 4)
-            // (5, 5)
+            // (0, 0)
+            // (2, 1)
             let y_delta = pair1.0.abs_diff(pair2.0) as i32; // 2
-            let x_delta = pair1.1.abs_diff(pair2.1) as i32; // 1
-            // The below antinodes are wrong. It is correct for downward sloping but not upward sloping antennas.
-            
-            let antinode1x: i32; 
-            let antinode2x: i32; 
-            if pair1.1 < pair2.1 {
-                antinode1x = pair1.1.min(pair2.1).sub(x_delta);
-                antinode2x = pair1.1.max(pair2.1).add(x_delta);
-            } else {
-                antinode1x = pair1.1.max(pair2.1).add(x_delta);
-                antinode2x = pair1.1.min(pair2.1).sub(x_delta);
+            // let x_delta = pair1.1.abs_diff(pair2.1) as i32; // 1
+            let x_slope = pair2.1.sub(pair1.1) as i32; // 1
+            // let mut antinodes: Vec<(i32, i32)> = vec![];
+            for pair in vec![pair1, pair2] {
+                if !antinode_locations.contains(&pair) {
+                    antinode_locations.push(pair);
+                }
             }
-            let antinode1 = (pair1.0.min(pair2.0).sub(y_delta), antinode1x); // (1, 3)
-            let antinode2 = (pair1.0.max(pair2.0).add(y_delta), antinode2x); // (7, 9)
-            for antinode in vec![antinode1, antinode2] {
-                match grid.get(antinode.0 as usize) {
-                    None => {},
+            let mut up = (pair1.0, pair1.1);
+            loop {
+                up.0 = up.0.sub(y_delta);
+                up.1 = up.1.sub(x_slope);
+                // println!("testing up: {:?}", up);
+                match grid.get(up.0 as usize) {
+                    None => { break },
                     Some(_) => {
-                        match grid[antinode.0 as usize].get(antinode.1 as usize) {
-                            None => {},
+                        match grid[up.0 as usize].get(up.1 as usize) {
+                            None => { break },
                             Some(_) => {
-                                if !antinode_locations.contains(&antinode) {
-                                    antinode_locations.push(antinode);
+                                if !antinode_locations.contains(&up) {
+                                    antinode_locations.push(up);
                                 }
                             }
                         }
                     }
                 }
             }
+
+            let mut down = (pair2.0, pair2.1);
+            loop {
+                down.0 = down.0.add(y_delta);
+                down.1 = down.1.add(x_slope);
+                match grid.get(down.0 as usize) {
+                    None => { break },
+                    Some(_) => {
+                        match grid[down.0 as usize].get(down.1 as usize) {
+                            None => { break },
+                            Some(_) => {
+                                if !antinode_locations.contains(&down) {
+                                    antinode_locations.push(down);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // let antinode1x: i32; 
+            // let antinode2x: i32; 
+            // if pair1.1 < pair2.1 {
+            //     antinode1x = pair1.1.min(pair2.1).sub(x_delta);
+            //     antinode2x = pair1.1.max(pair2.1).add(x_delta);
+            // } else {
+            //     antinode1x = pair1.1.max(pair2.1).add(x_delta);
+            //     antinode2x = pair1.1.min(pair2.1).sub(x_delta);
+            // }
+            // let antinode1 = (pair1.0.min(pair2.0).sub(y_delta), antinode1x); // (1, 3)
+            // let antinode2 = (pair1.0.max(pair2.0).add(y_delta), antinode2x); // (7, 9)
+            // for antinode in vec![antinode1, antinode2] {
+            //     match grid.get(antinode.0 as usize) {
+            //         None => {},
+            //         Some(_) => {
+            //             match grid[antinode.0 as usize].get(antinode.1 as usize) {
+            //                 None => {},
+            //                 Some(_) => {
+            //                     if !antinode_locations.contains(&antinode) {
+            //                         antinode_locations.push(antinode);
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }
 
         }
     }
